@@ -1,20 +1,130 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  ## Project
+  Mailer platform. Manage email templates and expose an API to send emails using those templates.
+  Downstream apps authenticate via SSO and call this service's API to trigger email sends.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  ## Auth model
+  This app is an OAuth2 client that delegates all authentication to the internal SSO.
+  It uses the `@better-auth/sso` plugin — it never handles passwords or social OAuth directly.
+
+  ### SSO flow (OAuth2 Authorization Code)
+  1. User visits this app and clicks "Sign in"
+  2. App redirects to SSO `/api/auth/oauth2/authorize` with `redirect_uri`, `state`, `client_id`, and `scope=openid email profile`
+  3. User authenticates on the SSO
+  4. SSO redirects to this app's `/auth/callback?code=<code>&state=<state>`
+  5. App server verifies `state`, then POSTs to SSO `/api/auth/oauth2/token` (form-encoded, never JSON) exchanging the code for `access_token` + `refresh_token`
+  6. App stores tokens server-side, sets a session cookie, and considers the user logged in
+
+  ### Token lifecycle
+  - Access JWT: EdDSA/Ed25519, 15-minute TTL — validate via JWKS endpoint, not a shared secret
+  - Refresh token: opaque, long-lived — POST to SSO `/api/auth/oauth2/token` with `grant_type=refresh_token`
+  - On logout: POST to SSO `/api/auth/oauth2/revoke` to revoke the refresh token, then destroy local session
+  - SSO-initiated logout surfaces as a 401 on the next refresh cycle — clear tokens and redirect to re-auth
+
+  ### Key environment variables
+  - `SSO_BASE_URL` — base URL of the SSO (e.g. `https://sso.internal`)
+  - `SSO_CLIENT_ID` — this app's OAuth2 client ID registered on the SSO
+  - `SSO_CLIENT_SECRET` — this app's client secret (server-side only, never client-exposed)
+
+  ## Tech stack
+  - Runtime / package manager: Bun
+  - Framework: Next.js 16 (App Router) + React 19
+  - API layer: Hono (mounted inside Next.js route handlers under `/api/*`)
+  - Auth library: better-auth with `@better-auth/sso` plugin (OAuth2 client, not provider)
+  - ORM: Drizzle ORM
+  - Database: PostgreSQL
+  - Styling: Tailwind CSS v4 + shadcn/ui (component library built on Radix UI)
+  - Data fetching: TanStack Query (React Query) for all client-side API calls
+  - Forms: react-hook-form + zod (zod schema is the single source of truth for validation)
+  - Email delivery: Resend (`resend` SDK) — all outbound email goes through Resend, never raw SMTP
+  - Language: TypeScript (strict mode — no `any`, no unchecked casts)
+
+  ## Database conventions
+  - All primary keys are UUID v7 (time-sortable, DB-generated or app-generated via `uuid-v7` package)
+  - Drizzle migrations in `db/migrations/`, schema definitions in `db/schema/`
+  - Never use auto-increment integers for user-facing IDs
+
+  ## Architecture conventions
+  - Hono handles all `/api/*` routes; Next.js App Router handles all UI pages
+  - better-auth config in `lib/auth.ts`; Hono app in `lib/api/`
+  - Shared types in `types/`
+  - Named exports everywhere; no default exports except Next.js page components
+  - Server Components by default; `"use client"` only when interactivity requires it
+
+  ## Folder structure
+  Generic shared code (no business logic):
+  - `components/` — reusable UI components
+  - `hooks/` — reusable hooks
+  - `utils/` — reusable utilities
+
+  Business logic lives in `features/<domain>/`:
+  - `features/<domain>/components/` — components tied to that domain
+  - `features/<domain>/hooks/` — hooks tied to that domain
+  - `features/<domain>/utils/` — utilities tied to that domain
+  - `features/<domain>/pages/` — page-level components for that domain
+
+  Next.js `app/` folder is routing-only. Every page file is a thin shell:
+  ```ts
+  // app/some-route/page.tsx
+  export default function SomePage() {
+    return <SomeFeaturePage />;
+  }
+  ```
+  All real logic lives in the corresponding `features/` page component.
+
+  Business hook convention — the async fn lives inside the hook, not outside:
+  ```ts
+  // features/templates/hooks/useCreateTemplate.ts
+  export function useCreateTemplate() {
+    const mutation = useMutation({
+      mutationFn: async (data: CreateTemplateInput) => { ... }
+    });
+    return mutation;
+  }
+  ```
+
+  ## Code style
+  - TypeScript strict: `strict: true`, no `any`, prefer `unknown` + type narrowing
+  - Functional components only, no class components
+  - Conventional Commits: `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`
+  - Never access `process.env` directly in code — re-export all env vars from `lib/constants.ts`:
+    ```ts
+    // lib/constants.ts
+    export const SSO_BASE_URL = process.env.SSO_BASE_URL;
+    ```
+    Import from `lib/constants.ts` everywhere else. This is the only file allowed to reference `process.env`.
+  - No hardcoded UI text strings — all text goes in `locales/en.json` and is accessed via the `t()` util:
+    ```ts
+    t("templates.title")   // → "Email Templates"
+    t("send.success")      // → "Email sent successfully"
+    ```
+    `locales/en.json` is the single source of truth for all copy. The project is English-only;
+    the locale file exists for maintainability, not multi-language support.
+  - No comments unless the WHY is non-obvious
+  - No barrel `index.ts` files unless the module is a public API boundary
+  - All client-side data fetching via TanStack Query — no raw `fetch` in components
+  - All forms use react-hook-form; define the zod schema first, derive the form type from it
+  - Use shadcn/ui components as the base for all UI — do not hand-roll primitives that shadcn already provides
+
+rules:
+  proposal:
+    - Always include a "Non-goals" section to keep scope tight
+    - Identify whether the change touches UI, API, DB schema, or all three
+    - Note any environment variables required (e.g. RESEND_API_KEY, SSO_CLIENT_ID)
+    - Call out if the change affects the public send API (versioning, breaking change risk)
+    - Keep proposals under 400 words
+  design:
+    - Show the Drizzle schema shape for any new tables; all PKs must be UUID v7
+    - Show the Hono route signature for any new endpoints
+    - For auth-related changes, describe how `@better-auth/sso` config in `lib/auth.ts` is affected
+    - Describe the Next.js page/layout involved for any UI changes
+  tasks:
+    - Keep tasks small and concrete: a task should do one thing and nothing more.
+    - Each task must be a single concern: one route, one component, one migration, etc.
+    - Tasks that touch DB schema must include a Drizzle migration step
+    - Tasks that add env vars must include updating `.env.example`
+    - Tasks that introduce UI text must include adding the keys to `locales/en.json`
+    - Order tasks so the app stays runnable after each one (schema → API → UI)
+    - Never mix Hono route implementation with UI component work in the same task
