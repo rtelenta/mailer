@@ -35,7 +35,7 @@ context: |
   - Auth library: better-auth with `@better-auth/sso` plugin (OAuth2 client, not provider)
   - ORM: Drizzle ORM
   - Database: PostgreSQL
-  - Styling: Tailwind CSS v4 + shadcn/ui (component library built on Radix UI)
+  - Styling: Tailwind CSS v4 + shadcn/ui
   - Data fetching: TanStack Query (React Query) for all client-side API calls
   - Forms: react-hook-form + zod (zod schema is the single source of truth for validation)
   - Email delivery: Resend (`resend` SDK) — all outbound email goes through Resend, never raw SMTP
