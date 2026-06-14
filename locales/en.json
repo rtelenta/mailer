@@ -6,5 +6,10 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "delete": "Delete"
+  },
+  "auth": {
+    "signIn": "Sign in with SSO",
+    "signInTitle": "Welcome to Mailer",
+    "signInDescription": "Sign in with your company account to continue."
   }
 }
