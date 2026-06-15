@@ -20,7 +20,7 @@ const oidcConfig = JSON.stringify({
   issuer,
   clientId: SSO_CLIENT_ID,
   clientSecret: SSO_CLIENT_SECRET,
-  discoveryEndpoint: `${SSO_BASE_URL}/api/auth/.well-known/openid-configuration`,
+  discoveryEndpoint: `${SSO_BASE_URL}/.well-known/oauth-authorization-server/api/auth`,
   authorizationEndpoint: `${SSO_BASE_URL}/api/auth/oauth2/authorize`,
   tokenEndpoint: `${SSO_BASE_URL}/api/auth/oauth2/token`,
   scopes: ["openid", "email", "profile"],
