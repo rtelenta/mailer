@@ -11,5 +11,37 @@
     "signIn": "Sign in with SSO",
     "signInTitle": "Welcome to Mailer",
     "signInDescription": "Sign in with your company account to continue."
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "templates": "Templates",
+      "settings": "Settings"
+    },
+    "header": {
+      "logout": "Log out",
+      "loadingUser": "Loading..."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard"
+  },
+  "templates": {
+    "title": "Templates"
+  },
+  "settings": {
+    "title": "Settings"
+  },
+  "account": {
+    "title": "Account Settings",
+    "sections": {
+      "account": "Account",
+      "apiTokens": "API Tokens",
+      "apiTokensComingSoon": "API token management is coming soon."
+    },
+    "profile": {
+      "name": "Name",
+      "email": "Email"
+    }
   }
 }
