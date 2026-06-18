@@ -23,8 +23,18 @@ Persistent CRUD for email templates owned by an authenticated user: create, list
 - The system MUST return HTTP 404 if the template does not exist or does not belong to the authenticated user (no information leakage)
 
 ### FR-4: Authentication Guard
-- All three endpoints (`POST /api/templates`, `GET /api/templates`, `DELETE /api/templates/:id`) MUST require an authenticated better-auth session
+- All endpoints MUST require an authenticated better-auth session
 - Unauthenticated requests MUST receive HTTP 401
+
+### FR-6: Edit Action in List
+- Each row in the templates list MUST include an edit action (link or button) that navigates to `/templates/:id/edit`
+- The edit action MUST appear alongside the delete action in the row actions column
+
+### FR-7: Update Template
+- `PATCH /api/templates/:id` MUST accept a partial body of mutable fields (any subset of: `name`, `mjml`, `subject`, `fromName`, `replyTo`, `preheader`)
+- The endpoint MUST return `401` if unauthenticated, `403` if the template belongs to a different user, `404` if not found, `422` on validation failure
+- The endpoint MUST return the full updated `TemplateRecord` on success (`200`) and update `updatedAt` to the current timestamp
+- See `mjml-template-editor` spec AR-1 for the full field-level contract
 
 ### FR-5: MJML size guard
 - The `mjml` field MUST be rejected with HTTP 422 if it exceeds 500,000 characters
@@ -36,6 +46,8 @@ Persistent CRUD for email templates owned by an authenticated user: create, list
 ```
 POST   /api/templates
 GET    /api/templates
+GET    /api/templates/:id
+PATCH  /api/templates/:id
 DELETE /api/templates/:id
 ```
 
@@ -111,5 +123,5 @@ interface TemplateListItem {
 - All API handlers are server-side only; no Drizzle imports in Client Components
 - `userId` is read exclusively from the better-auth session on the server — it MUST NOT be passed in request bodies
 - The `templatesRouter` Hono module MUST be mounted into the existing `lib/api/index.ts` aggregator
-- Client-side data fetching MUST use TanStack Query hooks (`useTemplates`, `useCreateTemplate`, `useDeleteTemplate`)
+- Client-side data fetching MUST use TanStack Query hooks (`useTemplates`, `useTemplate`, `useCreateTemplate`, `useUpdateTemplate`, `useDeleteTemplate`)
 - All env vars referenced in new code MUST be re-exported from `lib/constants.ts`

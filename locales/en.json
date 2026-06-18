@@ -58,6 +58,33 @@
       "cancel": "Cancel"
     }
   },
+  "templateEditor": {
+    "title": "Edit Template",
+    "backToTemplates": "Back to Templates",
+    "save": "Save",
+    "saving": "Saving...",
+    "saveSuccess": "Template saved.",
+    "saveError": "Failed to save template.",
+    "fields": {
+      "name": "Name",
+      "subject": "Subject",
+      "fromName": "From Name",
+      "replyTo": "Reply-To",
+      "preheader": "Preheader",
+      "mjml": "MJML Source",
+      "sampleData": "Sample Data"
+    },
+    "preview": {
+      "title": "Preview",
+      "errorTitle": "Compilation error",
+      "emptyState": "Start typing MJML to see a preview."
+    },
+    "sampleData": {
+      "label": "Sample Data (JSON)",
+      "description": "Provide values for Handlebars variables (e.g. {{name}}) used in the template.",
+      "invalid": "Invalid JSON — fix to update preview."
+    }
+  },
   "settings": {
     "title": "Settings"
   },
