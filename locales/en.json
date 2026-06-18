@@ -27,7 +27,36 @@
     "title": "Dashboard"
   },
   "templates": {
-    "title": "Templates"
+    "title": "Templates",
+    "newTemplate": "New Template",
+    "emptyState": "No templates yet. Create your first template to get started.",
+    "columns": {
+      "name": "Name",
+      "subject": "Subject",
+      "fromName": "From",
+      "createdAt": "Created"
+    },
+    "create": {
+      "title": "New Template",
+      "description": "Create a new email template.",
+      "submit": "Create Template",
+      "submitting": "Creating...",
+      "fields": {
+        "name": "Name",
+        "subject": "Subject",
+        "fromName": "From Name",
+        "replyTo": "Reply-To",
+        "preheader": "Preheader",
+        "mjml": "MJML Source"
+      }
+    },
+    "delete": {
+      "title": "Delete Template",
+      "descriptionPrefix": "Are you sure you want to delete",
+      "descriptionSuffix": "This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
   },
   "settings": {
     "title": "Settings"
