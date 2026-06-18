@@ -15,6 +15,13 @@
       "when": 1781798924607,
       "tag": "0001_tranquil_menace",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781810130539,
+      "tag": "0002_sleepy_golden_guardian",
+      "breakpoints": true
     }
   ]
 }

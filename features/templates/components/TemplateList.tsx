@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { DeleteTemplateDialog } from "@/features/templates/components/DeleteTemplateDialog";
 import { useTemplates } from "@/features/templates/hooks/useTemplates";
 import { t } from "@/utils/t";
@@ -71,7 +72,14 @@ export function TemplateList() {
         )}
         {templates?.map((template) => (
           <TableRow key={template.id}>
-            <TableCell className="font-medium">{template.name}</TableCell>
+            <TableCell className="font-medium">
+              <span className="flex items-center gap-2">
+                {template.name}
+                {template.role === "collaborator" && (
+                  <Badge variant="secondary">{t("templateSharing.sharedBadge")}</Badge>
+                )}
+              </span>
+            </TableCell>
             <TableCell className="text-muted-foreground">{template.subject}</TableCell>
             <TableCell className="text-muted-foreground">{template.fromName}</TableCell>
             <TableCell className="text-muted-foreground">
@@ -92,10 +100,12 @@ export function TemplateList() {
                   <PencilIcon data-icon="inline-start" />
                   Edit
                 </Button>
-                <DeleteTemplateDialog
-                  templateId={template.id}
-                  templateName={template.name}
-                />
+                {template.role === "owner" && (
+                  <DeleteTemplateDialog
+                    templateId={template.id}
+                    templateName={template.name}
+                  />
+                )}
               </div>
             </TableCell>
           </TableRow>

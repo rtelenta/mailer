@@ -85,6 +85,18 @@
       "invalid": "Invalid JSON — fix to update preview."
     }
   },
+  "templateSharing": {
+    "share": "Share",
+    "title": "Share Template",
+    "noCollaborators": "No collaborators yet.",
+    "removeCollaborator": "Remove collaborator",
+    "sharedBadge": "Shared",
+    "addCollaborator": {
+      "label": "Add collaborator",
+      "placeholder": "colleague@example.com",
+      "add": "Add"
+    }
+  },
   "settings": {
     "title": "Settings"
   },

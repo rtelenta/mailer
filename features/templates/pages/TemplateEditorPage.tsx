@@ -24,6 +24,7 @@ import {
   FieldDescription,
 } from "@/components/ui/field";
 import { TemplatePreviewPane } from "@/features/templates/components/TemplatePreviewPane";
+import { ShareTemplateSheet } from "@/features/templates/components/ShareTemplateSheet";
 import { useTemplate } from "@/features/templates/hooks/useTemplate";
 import { useUpdateTemplate } from "@/features/templates/hooks/useUpdateTemplate";
 import { t } from "@/utils/t";
@@ -179,6 +180,10 @@ export function TemplateEditorPage({ id }: { id: string }) {
             {...register("name")}
           />
         </Field>
+        <ShareTemplateSheet
+          templateId={id}
+          isOwner={template?.role === "owner"}
+        />
         <Button type="submit" disabled={isPending} className="shrink-0">
           {isPending && <Spinner data-icon="inline-start" />}
           {isPending ? t("templateEditor.saving") : t("templateEditor.save")}
