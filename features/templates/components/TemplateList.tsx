@@ -15,10 +15,12 @@ import {
   EmptyDescription,
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { DeleteTemplateDialog } from "@/features/templates/components/DeleteTemplateDialog";
 import { useTemplates } from "@/features/templates/hooks/useTemplates";
 import { t } from "@/utils/t";
-import { MailIcon } from "lucide-react";
+import Link from "next/link";
+import { MailIcon, PencilIcon } from "lucide-react";
 
 function TemplateSkeleton() {
   return (
@@ -76,10 +78,25 @@ export function TemplateList() {
               {new Date(template.createdAt).toLocaleDateString()}
             </TableCell>
             <TableCell className="text-right">
-              <DeleteTemplateDialog
-                templateId={template.id}
-                templateName={template.name}
-              />
+              <div className="flex items-center justify-end gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  render={
+                    <Link
+                      href={`/templates/${template.id}/edit`}
+                      aria-label={`Edit ${template.name}`}
+                    />
+                  }
+                >
+                  <PencilIcon data-icon="inline-start" />
+                  Edit
+                </Button>
+                <DeleteTemplateDialog
+                  templateId={template.id}
+                  templateName={template.name}
+                />
+              </div>
             </TableCell>
           </TableRow>
         ))}

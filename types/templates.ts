@@ -21,6 +21,15 @@ export interface TemplateListItem {
   createdAt: Date;
 }
 
+export interface UpdateTemplateInput {
+  name?: string;
+  mjml?: string;
+  subject?: string;
+  fromName?: string;
+  replyTo?: string | null;
+  preheader?: string | null;
+}
+
 export interface CreateTemplateInput {
   name: string;
   mjml: string;
