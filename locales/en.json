@@ -31,5 +31,17 @@
   },
   "settings": {
     "title": "Settings"
+  },
+  "account": {
+    "title": "Account Settings",
+    "sections": {
+      "account": "Account",
+      "apiTokens": "API Tokens",
+      "apiTokensComingSoon": "API token management is coming soon."
+    },
+    "profile": {
+      "name": "Name",
+      "email": "Email"
+    }
   }
 }
