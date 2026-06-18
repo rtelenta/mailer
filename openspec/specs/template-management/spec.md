@@ -12,15 +12,17 @@ Persistent CRUD for email templates owned by an authenticated user: create, list
 - On success, the system MUST return HTTP 201 with the created template record (id, name, subject, fromName, replyTo, preheader, createdAt)
 
 ### FR-2: List Templates
-- The system MUST return all templates owned by the authenticated user
-- The system MUST return an empty array when the user has no templates
-- The list MUST be ordered by `createdAt` descending (newest first)
+- The system MUST return all templates where the authenticated user is the owner OR an added collaborator
+- The system MUST return an empty array when the user has no owned or shared templates
+- The list MUST be ordered by `createdAt` descending (newest first) across both owned and shared templates
 - The response MUST conform to `{ templates: TemplateListItem[] }`
+- Each item MUST include `role: "owner" | "collaborator"` indicating the requesting user's relationship to the template
 
 ### FR-3: Delete Template
-- The system MUST delete the template with the given `id` if it exists and belongs to the authenticated user
+- The system MUST delete the template with the given `id` if it exists and the authenticated user is the **owner**
 - The system MUST return HTTP 204 with no response body on success
-- The system MUST return HTTP 404 if the template does not exist or does not belong to the authenticated user (no information leakage)
+- The system MUST return HTTP 403 if the authenticated user is a collaborator (not the owner)
+- The system MUST return HTTP 404 if the template does not exist or does not belong to/is not shared with the authenticated user
 
 ### FR-4: Authentication Guard
 - All endpoints MUST require an authenticated better-auth session
@@ -32,7 +34,8 @@ Persistent CRUD for email templates owned by an authenticated user: create, list
 
 ### FR-7: Update Template
 - `PATCH /api/templates/:id` MUST accept a partial body of mutable fields (any subset of: `name`, `mjml`, `subject`, `fromName`, `replyTo`, `preheader`)
-- The endpoint MUST return `401` if unauthenticated, `403` if the template belongs to a different user, `404` if not found, `422` on validation failure
+- `PATCH /api/templates/:id` MUST be accessible by the template **owner OR any collaborator**
+- The endpoint MUST return `401` if unauthenticated, `403` if the authenticated user has no relationship to the template (neither owner nor collaborator), `404` if not found, `422` on validation failure
 - The endpoint MUST return the full updated `TemplateRecord` on success (`200`) and update `updatedAt` to the current timestamp
 - See `mjml-template-editor` spec AR-1 for the full field-level contract
 
@@ -91,6 +94,7 @@ interface TemplateListItem {
   replyTo: string | null;
   preheader: string | null;
   createdAt: string;
+  role: "owner" | "collaborator";
 }
 
 // DELETE /api/templates/:id → 204 (no body)
@@ -124,4 +128,5 @@ interface TemplateListItem {
 - `userId` is read exclusively from the better-auth session on the server — it MUST NOT be passed in request bodies
 - The `templatesRouter` Hono module MUST be mounted into the existing `lib/api/index.ts` aggregator
 - Client-side data fetching MUST use TanStack Query hooks (`useTemplates`, `useTemplate`, `useCreateTemplate`, `useUpdateTemplate`, `useDeleteTemplate`)
+- `useTemplates` hook response type MUST include `role: "owner" | "collaborator"` on each item
 - All env vars referenced in new code MUST be re-exported from `lib/constants.ts`

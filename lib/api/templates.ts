@@ -4,7 +4,9 @@ import { generateId } from "better-auth";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { templates } from "@/db/schema/templates";
+import { templateShares } from "@/db/schema/templateShares";
 import { eq, and, desc, sql } from "drizzle-orm";
+import { templateSharesRouter } from "@/lib/api/templateShares";
 
 const createTemplateSchema = z.object({
   name: z.string().min(1).max(255),
@@ -26,13 +28,40 @@ templatesRouter.get("/templates", async (c) => {
   const userId = await getAuthenticatedUserId(c.req.raw);
   if (!userId) return c.json({ error: "Unauthorized" }, 401);
 
-  const rows = await db
-    .select()
+  const owned = await db
+    .select({
+      id: templates.id,
+      name: templates.name,
+      subject: templates.subject,
+      fromName: templates.fromName,
+      replyTo: templates.replyTo,
+      preheader: templates.preheader,
+      createdAt: templates.createdAt,
+      role: sql<"owner">`'owner'`,
+    })
     .from(templates)
-    .where(eq(templates.userId, userId))
-    .orderBy(desc(templates.createdAt));
+    .where(eq(templates.userId, userId));
 
-  return c.json({ templates: rows });
+  const shared = await db
+    .select({
+      id: templates.id,
+      name: templates.name,
+      subject: templates.subject,
+      fromName: templates.fromName,
+      replyTo: templates.replyTo,
+      preheader: templates.preheader,
+      createdAt: templates.createdAt,
+      role: sql<"collaborator">`'collaborator'`,
+    })
+    .from(templates)
+    .innerJoin(templateShares, eq(templateShares.templateId, templates.id))
+    .where(eq(templateShares.userId, userId));
+
+  const all = [...owned, ...shared].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  return c.json({ templates: all });
 });
 
 templatesRouter.post("/templates", async (c) => {
@@ -85,11 +114,23 @@ templatesRouter.get("/templates/:id", async (c) => {
     .where(eq(templates.id, id))
     .limit(1);
 
-  if (!row || row.userId !== userId) {
-    return c.json({ error: "Not found" }, 404);
+  if (!row) return c.json({ error: "Not found" }, 404);
+
+  if (row.userId === userId) {
+    return c.json({ ...row, role: "owner" });
   }
 
-  return c.json(row);
+  const [share] = await db
+    .select({ id: templateShares.id })
+    .from(templateShares)
+    .where(
+      and(eq(templateShares.templateId, id), eq(templateShares.userId, userId))
+    )
+    .limit(1);
+
+  if (!share) return c.json({ error: "Not found" }, 404);
+
+  return c.json({ ...row, role: "collaborator" });
 });
 
 templatesRouter.delete("/templates/:id", async (c) => {
@@ -98,19 +139,16 @@ templatesRouter.delete("/templates/:id", async (c) => {
 
   const id = c.req.param("id");
 
-  const existing = await db
-    .select({ id: templates.id })
+  const [existing] = await db
+    .select({ id: templates.id, userId: templates.userId })
     .from(templates)
-    .where(and(eq(templates.id, id), eq(templates.userId, userId)))
+    .where(eq(templates.id, id))
     .limit(1);
 
-  if (existing.length === 0) {
-    return c.json({ error: "Not found" }, 404);
-  }
+  if (!existing) return c.json({ error: "Not found" }, 404);
+  if (existing.userId !== userId) return c.json({ error: "Forbidden" }, 403);
 
-  await db
-    .delete(templates)
-    .where(and(eq(templates.id, id), eq(templates.userId, userId)));
+  await db.delete(templates).where(eq(templates.id, id));
 
   return new Response(null, { status: 204 });
 });
@@ -128,7 +166,20 @@ templatesRouter.patch("/templates/:id", async (c) => {
     .limit(1);
 
   if (!existing) return c.json({ error: "Not found" }, 404);
-  if (existing.userId !== userId) return c.json({ error: "Forbidden" }, 403);
+
+  if (existing.userId !== userId) {
+    const [share] = await db
+      .select({ id: templateShares.id })
+      .from(templateShares)
+      .where(
+        and(
+          eq(templateShares.templateId, id),
+          eq(templateShares.userId, userId)
+        )
+      )
+      .limit(1);
+    if (!share) return c.json({ error: "Forbidden" }, 403);
+  }
 
   const body = await c.req.json().catch(() => null);
   const parsed = updateTemplateSchema.safeParse(body);
@@ -146,3 +197,5 @@ templatesRouter.patch("/templates/:id", async (c) => {
 
   return c.json(updated);
 });
+
+templatesRouter.route("/templates", templateSharesRouter);

@@ -9,6 +9,7 @@ export interface TemplateRecord {
   preheader: string | null;
   createdAt: Date;
   updatedAt: Date;
+  role: "owner" | "collaborator";
 }
 
 export interface TemplateListItem {
@@ -19,6 +20,17 @@ export interface TemplateListItem {
   replyTo: string | null;
   preheader: string | null;
   createdAt: Date;
+  role: "owner" | "collaborator";
+}
+
+export interface TemplateCollaborator {
+  userId: string;
+  email: string;
+  name: string;
+}
+
+export interface AddShareInput {
+  email: string;
 }
 
 export interface UpdateTemplateInput {
