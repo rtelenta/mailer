@@ -7,7 +7,7 @@ export interface EmailDefaults {
 }
 
 export interface SendEmailParams {
-  to: string;
+  to: string | string[];
   mjml: string;
   content: Record<string, unknown>;
   defaults: EmailDefaults;
@@ -20,7 +20,7 @@ export interface ProviderSendParams {
   fromName: string;
   fromAddress: string;
   replyTo?: string;
-  to: string;
+  to: string | string[];
 }
 
 export type EmailResult =
