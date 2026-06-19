@@ -111,12 +111,38 @@
     "title": "Account Settings",
     "sections": {
       "account": "Account",
-      "apiTokens": "API Tokens",
-      "apiTokensComingSoon": "API token management is coming soon."
+      "apiTokens": "API Tokens"
     },
     "profile": {
       "name": "Name",
       "email": "Email"
+    },
+    "apiTokens": {
+      "emptyTitle": "No API tokens",
+      "emptyDescription": "Create a token to authenticate programmatic API calls.",
+      "never": "Never",
+      "revoke": "Revoke",
+      "revokeSuccess": "Token revoked.",
+      "revokeError": "Failed to revoke token.",
+      "createError": "Failed to create token.",
+      "columns": {
+        "name": "Name",
+        "prefix": "Prefix",
+        "lastUsed": "Last used"
+      },
+      "create": {
+        "label": "Token name",
+        "placeholder": "e.g. CI/CD pipeline",
+        "button": "Create Token",
+        "creating": "Creating..."
+      },
+      "reveal": {
+        "title": "Your new API token",
+        "instructions": "Copy this token now — it will not be shown again.",
+        "copy": "Copy",
+        "copied": "Copied to clipboard.",
+        "done": "Done"
+      }
     }
   }
 }
