@@ -9,7 +9,10 @@ interface TemplatePreviewPaneProps {
   compilationError: string | null;
 }
 
-export function TemplatePreviewPane({ html, compilationError }: TemplatePreviewPaneProps) {
+export function TemplatePreviewPane({
+  html,
+  compilationError,
+}: TemplatePreviewPaneProps) {
   if (compilationError) {
     return (
       <div className="flex flex-col gap-4 p-4">
@@ -17,7 +20,9 @@ export function TemplatePreviewPane({ html, compilationError }: TemplatePreviewP
           <TriangleAlertIcon />
           <AlertTitle>{t("templateEditor.preview.errorTitle")}</AlertTitle>
           <AlertDescription>
-            <pre className="text-xs whitespace-pre-wrap">{compilationError}</pre>
+            <pre className="text-xs whitespace-pre-wrap">
+              {compilationError}
+            </pre>
           </AlertDescription>
         </Alert>
       </div>
