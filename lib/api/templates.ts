@@ -10,6 +10,7 @@ import { eq, and, desc, sql, count, gte } from "drizzle-orm";
 import { templateSharesRouter } from "@/lib/api/templateShares";
 import { sendEmail } from "@/lib/email";
 import { FROM_ADDRESS } from "@/lib/constants";
+import { trackEvent } from "@/lib/usage/events";
 
 const createTemplateSchema = z.object({
   name: z.string().min(1).max(255),
@@ -276,9 +277,11 @@ templatesRouter.post("/templates/:id/test-send", async (c) => {
   });
 
   if (!result.ok) {
+    await trackEvent({ userId, templateId: id, eventType: "test_send_error", metadata: { code: result.code, message: result.message } });
     return c.json({ ok: false, code: result.code, message: result.message }, 502);
   }
 
+  await trackEvent({ userId, templateId: id, eventType: "test_send_ok", metadata: { messageId: result.messageId } });
   return c.json({ ok: true, messageId: result.messageId });
 });
 
