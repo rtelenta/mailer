@@ -24,7 +24,33 @@
     }
   },
   "dashboard": {
-    "title": "Dashboard"
+    "title": "Dashboard",
+    "stats": {
+      "templateCount": "Templates",
+      "totalSends": "Total Sends",
+      "totalApiCalls": "API Calls",
+      "errorRate": "Error Rate"
+    },
+    "chart": {
+      "title": "Sends over the last 30 days",
+      "sends": "Sends",
+      "errors": "Errors"
+    },
+    "table": {
+      "title": "Sends by template",
+      "emptyState": "No sends recorded yet.",
+      "columns": {
+        "templateName": "Template",
+        "sends": "Sends",
+        "errors": "Errors",
+        "errorRate": "Error Rate"
+      }
+    },
+    "breakdown": {
+      "title": "API vs. test sends",
+      "apiSends": "API sends",
+      "testSends": "Test sends"
+    }
   },
   "templates": {
     "title": "Templates",
