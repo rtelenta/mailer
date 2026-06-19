@@ -6,6 +6,7 @@ import { eq, and } from "drizzle-orm";
 import { getRequestUserId } from "@/lib/api/auth";
 import { sendEmail } from "@/lib/email";
 import { FROM_ADDRESS } from "@/lib/constants";
+import { trackEvent } from "@/lib/usage/events";
 
 const sendSchema = z.object({
   templateName: z.string().min(1),
@@ -60,8 +61,10 @@ v1Router.post("/send", async (c) => {
   });
 
   if (!result.ok) {
+    await trackEvent({ userId, templateId: template.id, eventType: "api_send_error", metadata: { code: result.code, message: result.message } });
     return c.json({ ok: false, code: result.code, message: result.message }, 400);
   }
 
+  await trackEvent({ userId, templateId: template.id, eventType: "api_send_ok", metadata: { messageId: result.messageId } });
   return c.json({ ok: true, messageId: result.messageId });
 });
