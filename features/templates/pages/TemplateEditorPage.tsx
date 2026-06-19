@@ -8,7 +8,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import Handlebars from "handlebars";
 import mjml from "mjml-browser";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, SendIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ import { TemplatePreviewPane } from "@/features/templates/components/TemplatePre
 import { ShareTemplateSheet } from "@/features/templates/components/ShareTemplateSheet";
 import { useTemplate } from "@/features/templates/hooks/useTemplate";
 import { useUpdateTemplate } from "@/features/templates/hooks/useUpdateTemplate";
+import { useSendTestEmail } from "@/features/templates/hooks/useSendTestEmail";
 import { t } from "@/utils/t";
 
 const schema = z.object({
@@ -67,6 +68,7 @@ function compilePreview(
 export function TemplateEditorPage({ id }: { id: string }) {
   const { data: template, isLoading } = useTemplate(id);
   const { mutate: update, isPending } = useUpdateTemplate(id);
+  const { mutate: sendTest, isPending: isSending } = useSendTestEmail(id);
 
   const [sampleData, setSampleData] = useState("");
   const [sampleDataError, setSampleDataError] = useState<string | null>(null);
@@ -123,6 +125,25 @@ export function TemplateEditorPage({ id }: { id: string }) {
 
     return () => clearTimeout(timer);
   }, [mjmlValue, sampleData]);
+
+  function handleSendTest() {
+    let parsed: Record<string, unknown> = {};
+    try {
+      if (sampleData.trim()) parsed = JSON.parse(sampleData);
+    } catch {
+      // invalid JSON — send with empty data
+    }
+    sendTest(parsed, {
+      onSuccess: () => toast.success(t("templateEditor.testSend.success")),
+      onError: (err) => {
+        if (err instanceof Error && err.message === "rate_limit_exceeded") {
+          toast.error(t("templateEditor.testSend.rateLimitError"));
+        } else {
+          toast.error(t("templateEditor.testSend.deliveryError"));
+        }
+      },
+    });
+  }
 
   function onSubmit(data: FormValues) {
     update(
@@ -184,6 +205,20 @@ export function TemplateEditorPage({ id }: { id: string }) {
           templateId={id}
           isOwner={template?.role === "owner"}
         />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={isSending}
+          onClick={handleSendTest}
+        >
+          {isSending ? (
+            <Spinner data-icon="inline-start" />
+          ) : (
+            <SendIcon data-icon="inline-start" />
+          )}
+          {isSending ? t("templateEditor.testSend.sending") : t("templateEditor.testSend.button")}
+        </Button>
         <Button type="submit" disabled={isPending} className="shrink-0">
           {isPending && <Spinner data-icon="inline-start" />}
           {isPending ? t("templateEditor.saving") : t("templateEditor.save")}

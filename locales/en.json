@@ -83,6 +83,13 @@
       "label": "Sample Data (JSON)",
       "description": "Provide values for Handlebars variables (e.g. {{name}}) used in the template.",
       "invalid": "Invalid JSON — fix to update preview."
+    },
+    "testSend": {
+      "button": "Send Test",
+      "sending": "Sending...",
+      "success": "Test email sent to your inbox.",
+      "rateLimitError": "Daily limit reached (100 test emails). Try again tomorrow.",
+      "deliveryError": "Failed to deliver the test email. Check your email settings."
     }
   },
   "templateSharing": {
