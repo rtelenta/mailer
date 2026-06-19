@@ -1,6 +1,7 @@
 "use client";
 
 import { ProfileAvatar } from "@/features/account/components/ProfileAvatar";
+import { ApiTokensSection } from "@/features/account/components/ApiTokensSection";
 import { useSession } from "@/features/shell/hooks/useSession";
 import { t } from "@/utils/t";
 
@@ -72,9 +73,7 @@ export function AccountSettingsPage() {
       </SettingsSection>
 
       <SettingsSection title={t("account.sections.apiTokens")}>
-        <p className="text-sm text-muted-foreground">
-          {t("account.sections.apiTokensComingSoon")}
-        </p>
+        <ApiTokensSection />
       </SettingsSection>
     </div>
   );
