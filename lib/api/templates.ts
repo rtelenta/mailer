@@ -5,8 +5,11 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { templates } from "@/db/schema/templates";
 import { templateShares } from "@/db/schema/templateShares";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { testEmailSends } from "@/db/schema/testEmailSends";
+import { eq, and, desc, sql, count, gte } from "drizzle-orm";
 import { templateSharesRouter } from "@/lib/api/templateShares";
+import { sendEmail } from "@/lib/email";
+import { FROM_ADDRESS } from "@/lib/constants";
 
 const createTemplateSchema = z.object({
   name: z.string().min(1).max(255),
@@ -196,6 +199,87 @@ templatesRouter.patch("/templates/:id", async (c) => {
     .returning();
 
   return c.json(updated);
+});
+
+const TEST_SEND_DAILY_LIMIT = 100;
+
+const testSendSchema = z.object({
+  sampleData: z.record(z.string(), z.unknown()).optional(),
+});
+
+templatesRouter.post("/templates/:id/test-send", async (c) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) return c.json({ error: "Unauthorized" }, 401);
+  const userId = session.user.id;
+  const userEmail = session.user.email;
+
+  const id = c.req.param("id");
+
+  const [row] = await db
+    .select()
+    .from(templates)
+    .where(eq(templates.id, id))
+    .limit(1);
+
+  if (!row) return c.json({ error: "Not found" }, 404);
+
+  if (row.userId !== userId) {
+    const [share] = await db
+      .select({ id: templateShares.id })
+      .from(templateShares)
+      .where(
+        and(eq(templateShares.templateId, id), eq(templateShares.userId, userId))
+      )
+      .limit(1);
+    if (!share) return c.json({ error: "Forbidden" }, 403);
+  }
+
+  const windowStart = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(testEmailSends)
+    .where(and(eq(testEmailSends.userId, userId), gte(testEmailSends.sentAt, windowStart)));
+
+  if (total >= TEST_SEND_DAILY_LIMIT) {
+    const [oldest] = await db
+      .select({ sentAt: testEmailSends.sentAt })
+      .from(testEmailSends)
+      .where(and(eq(testEmailSends.userId, userId), gte(testEmailSends.sentAt, windowStart)))
+      .orderBy(testEmailSends.sentAt)
+      .limit(1);
+    const resetAt = oldest
+      ? new Date(oldest.sentAt.getTime() + 24 * 60 * 60 * 1000).toISOString()
+      : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    return c.json({ error: "rate_limit_exceeded", limit: TEST_SEND_DAILY_LIMIT, resetAt }, 429);
+  }
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = testSendSchema.safeParse(body);
+  const sampleData = parsed.success ? (parsed.data.sampleData ?? {}) : {};
+
+  const result = await sendEmail({
+    to: userEmail,
+    mjml: row.mjml,
+    content: sampleData,
+    defaults: {
+      subject: row.subject,
+      fromName: row.fromName,
+      fromAddress: FROM_ADDRESS ?? "",
+      replyTo: row.replyTo ?? undefined,
+      preheader: row.preheader ?? undefined,
+    },
+  });
+
+  await db.insert(testEmailSends).values({
+    userId,
+    templateId: id,
+  });
+
+  if (!result.ok) {
+    return c.json({ ok: false, code: result.code, message: result.message }, 502);
+  }
+
+  return c.json({ ok: true, messageId: result.messageId });
 });
 
 templatesRouter.route("/templates", templateSharesRouter);
