@@ -133,7 +133,7 @@ interface UpdateTemplateInput {
 
 The editor uses the authenticated app shell (sidebar + header). The content area is a full-height two-column layout:
 
-- Left column: header fields stacked vertically, then the MJML code editor (flex-grow to fill remaining height), then the sample-data JSON input
+- Left column: header fields stacked vertically, then the MJML code editor (flex-grow to fill remaining height), then the sample-data JSON code editor (CodeMirror 6, JSON language mode)
 - Right column: the HTML preview iframe, full height of the content area
 
 ### UR-2: Navigation
