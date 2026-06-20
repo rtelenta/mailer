@@ -90,6 +90,7 @@ export function TemplateList() {
                 <Button
                   variant="ghost"
                   size="sm"
+                  nativeButton={false}
                   render={
                     <Link
                       href={`/templates/${template.id}/edit`}

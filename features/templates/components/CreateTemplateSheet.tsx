@@ -14,7 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -75,9 +75,7 @@ export function CreateTemplateSheet() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger
-        render={<Button />}
-      >
+      <SheetTrigger className={buttonVariants()}>
         <PlusIcon data-icon="inline-start" />
         {t("templates.newTemplate")}
       </SheetTrigger>
