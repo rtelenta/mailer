@@ -24,9 +24,9 @@ All validation rules from `template-management` FR-1 apply (same field constrain
 
 ### FR-3: MJML Code Pane
 
-The editor MUST display a text area containing the template's current `mjml` value.
+The editor MUST display a code editor (CodeMirror 6, XML language mode) containing the template's current `mjml` value.
 
-Changes to the text area MUST trigger a live recompile of the preview after a debounce of no more than 500 ms.
+Changes to the code editor MUST trigger a live recompile of the preview after a debounce of no more than 500 ms.
 
 ### FR-4: Live HTML Preview
 
@@ -133,7 +133,7 @@ interface UpdateTemplateInput {
 
 The editor uses the authenticated app shell (sidebar + header). The content area is a full-height two-column layout:
 
-- Left column: header fields stacked vertically, then the MJML textarea (flex-grow to fill remaining height), then the sample-data JSON input
+- Left column: header fields stacked vertically, then the MJML code editor (flex-grow to fill remaining height), then the sample-data JSON code editor (CodeMirror 6, JSON language mode)
 - Right column: the HTML preview iframe, full height of the content area
 
 ### UR-2: Navigation

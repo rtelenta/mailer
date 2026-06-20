@@ -113,7 +113,7 @@ interface TemplateListItem {
 - The MJML source textarea MUST NOT be a required field; submitting without it MUST be allowed
 - The form MUST use react-hook-form with a Zod schema as the single source of validation truth
 - Required fields MUST show inline validation errors
-- On successful submission, the Sheet MUST close and the template list MUST refresh
+- On successful submission, the Sheet MUST close and the user MUST be redirected to `/templates/:id/edit` for the newly created template
 - The submit button MUST be disabled and show a loading state while the request is in flight
 
 ### UR-3: Delete Confirmation
