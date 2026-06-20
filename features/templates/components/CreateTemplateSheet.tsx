@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -41,6 +42,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function CreateTemplateSheet() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const { mutate: createTemplate, isPending } = useCreateTemplate();
 
@@ -62,9 +64,10 @@ export function CreateTemplateSheet() {
         replyTo: data.replyTo || undefined,
       },
       {
-        onSuccess: () => {
+        onSuccess: (created) => {
           reset();
           setOpen(false);
+          router.push(`/templates/${created.id}/edit`);
         },
       }
     );
