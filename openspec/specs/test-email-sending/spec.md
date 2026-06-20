@@ -8,7 +8,7 @@ Send a compiled, Handlebars-rendered test email from a template to the authentic
 - `POST /api/templates/:id/test-send` MUST send the template to the authenticated user's own email address
 - The request body MAY include `sampleData: Record<string, unknown>`; if omitted or empty it defaults to `{}`
 - The system MUST compile the template's `mjml` field and apply `sampleData` as Handlebars variables before sending
-- Template defaults (`subject`, `fromName`, `replyTo`, `preheader`) MUST be taken from the stored template record
+- Template defaults (`subject`, `fromName`, `replyTo`) MUST be taken from the stored template record
 - The `from` address MUST be taken from `FROM_ADDRESS` in `lib/constants.ts`
 - The recipient address MUST be the authenticated user's email from their better-auth session — the caller MUST NOT supply a recipient
 

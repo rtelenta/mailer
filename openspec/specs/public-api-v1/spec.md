@@ -18,7 +18,7 @@ Authenticated external callers MUST be able to send a transactional email by POS
 - **THEN** the email is delivered to all recipients and the response is `200 { ok: true, messageId }`
 
 #### Scenario: Per-send override takes precedence over template default
-- **WHEN** the request body includes `subject` (or `fromName`, `replyTo`, `preheader`)
+- **WHEN** the request body includes `subject` (or `fromName`, `replyTo`)
 - **THEN** the override value is used in place of the stored template value for that field
 
 #### Scenario: Template not found

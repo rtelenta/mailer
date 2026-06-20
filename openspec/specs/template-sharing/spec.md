@@ -92,7 +92,6 @@ interface TemplateListItem {
   subject: string;
   fromName: string;
   replyTo: string | null;
-  preheader: string | null;
   createdAt: string; // ISO 8601
   role: "owner" | "collaborator"; // NEW
 }

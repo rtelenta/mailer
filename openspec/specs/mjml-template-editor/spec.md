@@ -19,7 +19,6 @@ The editor MUST display editable fields for:
 - `subject`
 - `fromName`
 - `replyTo` (optional)
-- `preheader` (optional)
 
 All validation rules from `template-management` FR-1 apply (same field constraints).
 
@@ -45,7 +44,7 @@ The editor MUST provide a JSON input field where users can enter key-value pairs
 
 The sample data input MUST accept any valid JSON object. Invalid JSON MUST show a parse error inline; the preview MUST continue to show the last valid render.
 
-When sample data is present, Handlebars tokens (`{{variableName}}`) in both the MJML source and header fields (`subject`, `fromName`, `replyTo`, `preheader`) MUST be replaced with corresponding values before preview render.
+When sample data is present, Handlebars tokens (`{{variableName}}`) in both the MJML source and header fields (`subject`, `fromName`, `replyTo`) MUST be replaced with corresponding values before preview render.
 
 Missing or unknown variables MUST render as empty strings (Handlebars default behavior). No variable validation is performed.
 
@@ -86,7 +85,6 @@ mjml?:      string, min 1, max 500,000 chars
 subject?:   string, min 1, max 998
 fromName?:  string, min 1, max 255
 replyTo?:   string, valid email | null
-preheader?: string, max 255 | null
 ```
 
 The endpoint MUST return the full updated `TemplateRecord` on success (`200`).
@@ -110,7 +108,6 @@ interface TemplateRecord {
   subject: string;
   fromName: string;
   replyTo: string | null;
-  preheader: string | null;
   createdAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
 }
@@ -125,7 +122,6 @@ interface UpdateTemplateInput {
   subject?: string;
   fromName?: string;
   replyTo?: string | null;
-  preheader?: string | null;
 }
 ```
 
