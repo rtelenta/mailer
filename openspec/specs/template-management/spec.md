@@ -5,11 +5,12 @@ Persistent CRUD for email templates owned by an authenticated user: create, list
 ## Functional Requirements
 
 ### FR-1: Create Template
-- The system MUST accept a create request with the following fields: `name` (required), `mjml` (required), `subject` (required), `fromName` (required), `replyTo` (optional), `preheader` (optional)
+- The system MUST accept a create request with the following fields: `name` (required), `subject` (required), `fromName` (required), `replyTo` (optional), `mjml` (optional, max 500,000 chars)
+- When `mjml` is omitted, the system MUST store an empty string `""` for the field
 - The system MUST validate input against a Zod schema before persisting; invalid input MUST return HTTP 422 with a structured error body
 - The system MUST generate a UUID v7 for the template `id` — the caller MUST NOT supply an ID
 - The system MUST associate the new template with the authenticated user's ID
-- On success, the system MUST return HTTP 201 with the created template record (id, name, subject, fromName, replyTo, preheader, createdAt)
+- On success, the system MUST return HTTP 201 with the created template record (id, name, subject, fromName, replyTo, createdAt)
 
 ### FR-2: List Templates
 - The system MUST return all templates where the authenticated user is the owner OR an added collaborator
@@ -33,7 +34,7 @@ Persistent CRUD for email templates owned by an authenticated user: create, list
 - The edit action MUST appear alongside the delete action in the row actions column
 
 ### FR-7: Update Template
-- `PATCH /api/templates/:id` MUST accept a partial body of mutable fields (any subset of: `name`, `mjml`, `subject`, `fromName`, `replyTo`, `preheader`)
+- `PATCH /api/templates/:id` MUST accept a partial body of mutable fields (any subset of: `name`, `mjml`, `subject`, `fromName`, `replyTo`)
 - `PATCH /api/templates/:id` MUST be accessible by the template **owner OR any collaborator**
 - The endpoint MUST return `401` if unauthenticated, `403` if the authenticated user has no relationship to the template (neither owner nor collaborator), `404` if not found, `422` on validation failure
 - The endpoint MUST return the full updated `TemplateRecord` on success (`200`) and update `updatedAt` to the current timestamp
@@ -59,11 +60,10 @@ DELETE /api/templates/:id
 ```ts
 interface CreateTemplateInput {
   name: string;          // non-empty, max 255 chars
-  mjml: string;          // non-empty, max 500,000 chars
+  mjml?: string;         // optional, max 500,000 chars; defaults to "" when absent
   subject: string;       // non-empty, max 998 chars (RFC 5322 subject limit)
   fromName: string;      // non-empty, max 255 chars
   replyTo?: string;      // optional valid email address
-  preheader?: string;    // optional, max 255 chars
 }
 ```
 
@@ -77,7 +77,6 @@ interface TemplateRecord {
   subject: string;
   fromName: string;
   replyTo: string | null;
-  preheader: string | null;
   createdAt: string;  // ISO 8601
 }
 
@@ -92,7 +91,6 @@ interface TemplateListItem {
   subject: string;
   fromName: string;
   replyTo: string | null;
-  preheader: string | null;
   createdAt: string;
   role: "owner" | "collaborator";
 }
@@ -111,7 +109,8 @@ interface TemplateListItem {
 
 ### UR-2: Create Template
 - The page MUST include a trigger (button) to open a Sheet component containing the create-template form
-- The form MUST include fields for: name, subject, from-name, MJML source (textarea), reply-to, preheader
+- The form MUST include fields for: name, subject, from-name, MJML source (textarea, optional), reply-to
+- The MJML source textarea MUST NOT be a required field; submitting without it MUST be allowed
 - The form MUST use react-hook-form with a Zod schema as the single source of validation truth
 - Required fields MUST show inline validation errors
 - On successful submission, the Sheet MUST close and the template list MUST refresh

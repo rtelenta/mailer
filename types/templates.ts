@@ -6,7 +6,6 @@ export interface TemplateRecord {
   subject: string;
   fromName: string;
   replyTo: string | null;
-  preheader: string | null;
   createdAt: Date;
   updatedAt: Date;
   role: "owner" | "collaborator";
@@ -18,7 +17,6 @@ export interface TemplateListItem {
   subject: string;
   fromName: string;
   replyTo: string | null;
-  preheader: string | null;
   createdAt: Date;
   role: "owner" | "collaborator";
 }
@@ -39,14 +37,12 @@ export interface UpdateTemplateInput {
   subject?: string;
   fromName?: string;
   replyTo?: string | null;
-  preheader?: string | null;
 }
 
 export interface CreateTemplateInput {
   name: string;
-  mjml: string;
+  mjml?: string;
   subject: string;
   fromName: string;
   replyTo?: string;
-  preheader?: string;
 }

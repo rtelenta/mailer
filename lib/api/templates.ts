@@ -14,11 +14,10 @@ import { trackEvent } from "@/lib/usage/events";
 
 const createTemplateSchema = z.object({
   name: z.string().min(1).max(255),
-  mjml: z.string().min(1).max(500_000),
+  mjml: z.string().max(500_000).optional(),
   subject: z.string().min(1).max(998),
   fromName: z.string().min(1).max(255),
   replyTo: z.string().email().optional(),
-  preheader: z.string().max(255).optional(),
 });
 
 export const templatesRouter = new Hono();
@@ -39,7 +38,6 @@ templatesRouter.get("/templates", async (c) => {
       subject: templates.subject,
       fromName: templates.fromName,
       replyTo: templates.replyTo,
-      preheader: templates.preheader,
       createdAt: templates.createdAt,
       role: sql<"owner">`'owner'`,
     })
@@ -53,7 +51,6 @@ templatesRouter.get("/templates", async (c) => {
       subject: templates.subject,
       fromName: templates.fromName,
       replyTo: templates.replyTo,
-      preheader: templates.preheader,
       createdAt: templates.createdAt,
       role: sql<"collaborator">`'collaborator'`,
     })
@@ -78,7 +75,8 @@ templatesRouter.post("/templates", async (c) => {
     return c.json({ error: "Validation failed", issues: parsed.error.issues }, 422);
   }
 
-  const { name, mjml, subject, fromName, replyTo, preheader } = parsed.data;
+  const { name, subject, fromName, replyTo } = parsed.data;
+  const mjml = parsed.data.mjml ?? "";
 
   const [created] = await db
     .insert(templates)
@@ -90,7 +88,6 @@ templatesRouter.post("/templates", async (c) => {
       subject,
       fromName,
       replyTo: replyTo ?? null,
-      preheader: preheader ?? null,
     })
     .returning();
 
@@ -103,7 +100,6 @@ const updateTemplateSchema = z.object({
   subject: z.string().min(1).max(998).optional(),
   fromName: z.string().min(1).max(255).optional(),
   replyTo: z.string().email().nullable().optional(),
-  preheader: z.string().max(255).nullable().optional(),
 });
 
 templatesRouter.get("/templates/:id", async (c) => {
@@ -267,7 +263,6 @@ templatesRouter.post("/templates/:id/test-send", async (c) => {
       fromName: row.fromName,
       fromAddress: FROM_ADDRESS ?? "",
       replyTo: row.replyTo ?? undefined,
-      preheader: row.preheader ?? undefined,
     },
   });
 

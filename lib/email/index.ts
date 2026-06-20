@@ -9,6 +9,10 @@ export type { ProviderSendParams } from './types';
 const provider: EmailProvider = new ResendEmailProvider();
 
 export async function sendEmail(params: SendEmailParams): Promise<EmailResult> {
+  if (!params.defaults.fromAddress) {
+    return { ok: false, code: 'MISSING_FROM_ADDRESS', message: 'FROM_ADDRESS env var is not configured' };
+  }
+
   const compiled = await compileMjml(params.mjml);
   if ('error' in compiled) {
     return { ok: false, code: 'MJML_COMPILE_ERROR', message: compiled.error };

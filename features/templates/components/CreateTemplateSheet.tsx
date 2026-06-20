@@ -37,8 +37,7 @@ const schema = z.object({
     .email()
     .optional()
     .or(z.literal("")),
-  preheader: z.string().max(255).optional(),
-  mjml: z.string().min(1).max(500_000),
+  mjml: z.string().max(500_000).optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -63,7 +62,7 @@ export function CreateTemplateSheet() {
         subject: data.subject,
         fromName: data.fromName,
         replyTo: data.replyTo || undefined,
-        preheader: data.preheader || undefined,
+
         mjml: data.mjml,
       },
       {
@@ -131,17 +130,6 @@ export function CreateTemplateSheet() {
               />
               {errors.replyTo && <FieldError>{errors.replyTo.message}</FieldError>}
               <FieldDescription>Optional</FieldDescription>
-            </Field>
-
-            <Field data-invalid={!!errors.preheader}>
-              <FieldLabel htmlFor="preheader">{t("templates.create.fields.preheader")}</FieldLabel>
-              <Input
-                id="preheader"
-                aria-invalid={!!errors.preheader}
-                {...register("preheader")}
-              />
-              {errors.preheader && <FieldError>{errors.preheader.message}</FieldError>}
-              <FieldDescription>Optional — short preview text shown in email clients.</FieldDescription>
             </Field>
 
             <Field data-invalid={!!errors.mjml}>

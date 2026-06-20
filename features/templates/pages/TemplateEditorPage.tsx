@@ -34,8 +34,7 @@ const schema = z.object({
   name: z.string().min(1).max(255),
   subject: z.string().min(1).max(998),
   fromName: z.string().min(1).max(255),
-  replyTo: z.string().email().optional().or(z.literal("")),
-  preheader: z.string().max(255).optional(),
+  replyTo: z.email().optional().or(z.literal("")),
   mjml: z.string().min(1).max(500_000),
 });
 
@@ -97,7 +96,6 @@ export function TemplateEditorPage({ id }: { id: string }) {
         subject: template.subject,
         fromName: template.fromName,
         replyTo: template.replyTo ?? "",
-        preheader: template.preheader ?? "",
         mjml: template.mjml,
       });
       setFormReady(true);
@@ -154,7 +152,6 @@ export function TemplateEditorPage({ id }: { id: string }) {
         subject: data.subject,
         fromName: data.fromName,
         replyTo: data.replyTo || null,
-        preheader: data.preheader || null,
         mjml: data.mjml,
       },
       {
@@ -279,19 +276,6 @@ export function TemplateEditorPage({ id }: { id: string }) {
               )}
             </Field>
 
-            <Field data-invalid={!!errors.preheader}>
-              <FieldLabel htmlFor="preheader">
-                {t("templateEditor.fields.preheader")}
-              </FieldLabel>
-              <Input
-                id="preheader"
-                aria-invalid={!!errors.preheader}
-                {...register("preheader")}
-              />
-              {errors.preheader && (
-                <FieldError>{errors.preheader.message}</FieldError>
-              )}
-            </Field>
           </FieldGroup>
 
           <Separator />

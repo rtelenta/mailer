@@ -43,6 +43,13 @@
       "when": 1781834843234,
       "tag": "0005_purple_dorian_gray",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781934707734,
+      "tag": "0006_smart_fabian_cortez",
+      "breakpoints": true
     }
   ]
 }

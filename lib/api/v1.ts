@@ -15,7 +15,6 @@ const sendSchema = z.object({
   subject: z.string().min(1).optional(),
   fromName: z.string().min(1).optional(),
   replyTo: z.string().email().optional(),
-  preheader: z.string().optional(),
 });
 
 export const v1Router = new Hono();
@@ -30,7 +29,7 @@ v1Router.post("/send", async (c) => {
     return c.json({ error: "Validation failed", issues: parsed.error.issues }, 422);
   }
 
-  const { templateName, to, content, subject, fromName, replyTo, preheader } = parsed.data;
+  const { templateName, to, content, subject, fromName, replyTo } = parsed.data;
 
   const [template] = await db
     .select()
@@ -44,7 +43,6 @@ v1Router.post("/send", async (c) => {
   if (subject !== undefined) overrides.subject = subject;
   if (fromName !== undefined) overrides.fromName = fromName;
   if (replyTo !== undefined) overrides.replyTo = replyTo;
-  if (preheader !== undefined) overrides.preheader = preheader;
 
   const result = await sendEmail({
     to: Array.isArray(to) ? to : [to],
@@ -55,7 +53,6 @@ v1Router.post("/send", async (c) => {
       fromName: template.fromName,
       fromAddress: FROM_ADDRESS ?? "",
       replyTo: template.replyTo ?? undefined,
-      preheader: template.preheader ?? undefined,
     },
     overrides: Object.keys(overrides).length > 0 ? overrides : undefined,
   });

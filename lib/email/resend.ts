@@ -14,10 +14,10 @@ export class ResendEmailProvider implements EmailProvider {
     try {
       const { data, error } = await this.client.emails.send({
         to: params.to,
-        from: `${params.fromName} <${params.fromAddress}>`,
+        from: `"${params.fromName}" <${params.fromAddress}>`,
         subject: params.subject,
         html: params.html,
-        ...(params.replyTo ? { reply_to: params.replyTo } : {}),
+        ...(params.replyTo ? { replyTo: params.replyTo } : {}),
       });
 
       if (error) {
