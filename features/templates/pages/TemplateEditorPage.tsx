@@ -12,7 +12,6 @@ import { ArrowLeftIcon, SendIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { CodeEditor } from "@/components/ui/code-editor";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
@@ -297,15 +296,11 @@ export function TemplateEditorPage({ id }: { id: string }) {
           </Field>
 
           <Field data-invalid={!!sampleDataError}>
-            <FieldLabel htmlFor="sampleData">
-              {t("templateEditor.sampleData.label")}
-            </FieldLabel>
-            <Textarea
-              id="sampleData"
-              rows={4}
-              className="font-mono text-xs"
+            <FieldLabel>{t("templateEditor.sampleData.label")}</FieldLabel>
+            <CodeEditor
+              lang="json"
               value={sampleData}
-              onChange={(e) => setSampleData(e.target.value)}
+              onChange={setSampleData}
               placeholder='{ "name": "Alice" }'
             />
             {sampleDataError && <FieldError>{sampleDataError}</FieldError>}
