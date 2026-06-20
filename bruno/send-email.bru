@@ -18,10 +18,18 @@ headers {
 body:json {
   {
     "templateName": "Welcome Email",
-    "to": "recipient@example.com",
-    "content": {
-      "firstName": "Alice",
-      "productName": "Mailer"
-    }
+    "to": "recipient@example.com"
   }
 }
+
+// If your template uses Handlebars variables, add a "content" object:
+// body:json {
+//   {
+//     "templateName": "Welcome Email",
+//     "to": "recipient@example.com",
+//     "content": {
+//       "firstName": "Alice",
+//       "productName": "Mailer"
+//     }
+//   }
+// }
