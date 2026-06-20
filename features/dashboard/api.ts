@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { getDashboardStats } from "@/lib/db/dashboard";
+import { getDashboardStats } from "@/features/dashboard/db";
 import { getRequestUserId } from "@/lib/api/auth";
 
 export const dashboardRouter = new Hono();

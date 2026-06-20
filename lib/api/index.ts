@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { auth } from "@/lib/auth";
-import { templatesRouter } from "@/lib/api/templates";
-import { tokensRouter } from "@/lib/api/tokens";
-import { v1Router } from "@/lib/api/v1";
-import { dashboardRouter } from "@/lib/api/dashboard";
+import { templatesRouter } from "@/features/templates/api";
+import { tokensRouter } from "@/features/account/api";
+import { v1Router } from "@/features/send/api";
+import { dashboardRouter } from "@/features/dashboard/api";
 
 export const app = new Hono().basePath("/api");
 

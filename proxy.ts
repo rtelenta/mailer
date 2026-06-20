@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 
-const PUBLIC_PATHS = ["/login", "/api/auth", "/api/health"];
+const PUBLIC_PATHS = ["/login", "/api/auth", "/api/health", "/api/v1"];
 
 export async function proxy(request: NextRequest) {
   const isPublic = PUBLIC_PATHS.some((p) =>

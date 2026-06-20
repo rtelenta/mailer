@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { t } from "@/utils/t";
-import type { DashboardStats } from "@/lib/db/dashboard";
+import type { DashboardStats } from "@/features/dashboard/db";
 
 const chartConfig: ChartConfig = {
   sends: {
