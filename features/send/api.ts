@@ -4,9 +4,9 @@ import { db } from "@/db";
 import { templates } from "@/db/schema/templates";
 import { eq, and } from "drizzle-orm";
 import { getRequestUserId } from "@/lib/api/auth";
-import { sendEmail } from "@/lib/email";
+import { sendEmail } from "@/features/email";
 import { FROM_ADDRESS } from "@/lib/constants";
-import { trackEvent } from "@/lib/usage/events";
+import { trackEvent } from "@/features/usage/events";
 
 const sendSchema = z.object({
   templateName: z.string().min(1),
