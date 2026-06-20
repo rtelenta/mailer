@@ -26,7 +26,7 @@ Edit `bruno/environments/local.bru`:
 
 ```
 vars {
-  baseUrl: http://localhost:3000
+  baseUrl: http://mailer.localhost:3006
   apiToken: <paste-your-token-here>
 }
 ```
@@ -45,8 +45,8 @@ In Bruno's environment dropdown (top-right), select **local**.
 
 ## Requests
 
-| Request | Description |
-|---------|-------------|
+| Request      | Description                                                             |
+| ------------ | ----------------------------------------------------------------------- |
 | `Send Email` | `POST /api/v1/send` — send a transactional email using a named template |
 
 ### Send Email
@@ -79,10 +79,10 @@ Optional overrides (take precedence over template defaults):
 
 ### Responses
 
-| Status | Meaning |
-|--------|---------|
-| `200 { ok: true, messageId }` | Email delivered |
-| `400 { ok: false, code, message }` | Delivery failure from the email provider |
-| `401 { error: "Unauthorized" }` | Missing or invalid API token |
-| `404 { error: "Template not found" }` | No template with that name in your account |
-| `422 { error: "Validation failed", issues }` | Invalid request body |
+| Status                                       | Meaning                                    |
+| -------------------------------------------- | ------------------------------------------ |
+| `200 { ok: true, messageId }`                | Email delivered                            |
+| `400 { ok: false, code, message }`           | Delivery failure from the email provider   |
+| `401 { error: "Unauthorized" }`              | Missing or invalid API token               |
+| `404 { error: "Template not found" }`        | No template with that name in your account |
+| `422 { error: "Validation failed", issues }` | Invalid request body                       |
