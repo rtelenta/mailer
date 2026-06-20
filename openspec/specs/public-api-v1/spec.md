@@ -9,6 +9,8 @@ Defines the public REST API (v1) that allows authenticated external callers to p
 ### Requirement: POST /api/v1/send
 Authenticated external callers MUST be able to send a transactional email by POSTing to `/api/v1/send` with a template name, recipient(s), optional Handlebars content, and optional per-send field overrides.
 
+The Next.js proxy MUST NOT apply session-cookie authentication to `/api/v1/*` paths; these routes authenticate exclusively via Bearer API token within the route handler. The proxy MUST NOT redirect these requests to the login page.
+
 #### Scenario: Successful send with content variables
 - **WHEN** a valid Bearer token is presented, `templateName` matches a template owned by the token's user, `to` is a valid email, and `content` supplies all Handlebars variables
 - **THEN** the response is `200 { ok: true, messageId: "<provider-id>" }`
