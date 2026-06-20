@@ -3,7 +3,6 @@ export interface EmailDefaults {
   fromName: string;
   fromAddress: string;
   replyTo?: string;
-  preheader?: string;
 }
 
 export interface SendEmailParams {

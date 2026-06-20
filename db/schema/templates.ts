@@ -11,7 +11,6 @@ export const templates = pgTable("templates", {
   subject: text("subject").notNull(),
   fromName: text("from_name").notNull(),
   replyTo: text("reply_to"),
-  preheader: text("preheader"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
