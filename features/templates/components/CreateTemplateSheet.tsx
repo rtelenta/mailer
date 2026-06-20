@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Field,
@@ -37,7 +36,6 @@ const schema = z.object({
     .email()
     .optional()
     .or(z.literal("")),
-  mjml: z.string().max(500_000).optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -62,8 +60,6 @@ export function CreateTemplateSheet() {
         subject: data.subject,
         fromName: data.fromName,
         replyTo: data.replyTo || undefined,
-
-        mjml: data.mjml,
       },
       {
         onSuccess: () => {
@@ -132,17 +128,6 @@ export function CreateTemplateSheet() {
               <FieldDescription>Optional</FieldDescription>
             </Field>
 
-            <Field data-invalid={!!errors.mjml}>
-              <FieldLabel htmlFor="mjml">{t("templates.create.fields.mjml")}</FieldLabel>
-              <Textarea
-                id="mjml"
-                rows={12}
-                className="font-mono text-xs"
-                aria-invalid={!!errors.mjml}
-                {...register("mjml")}
-              />
-              {errors.mjml && <FieldError>{errors.mjml.message}</FieldError>}
-            </Field>
           </FieldGroup>
 
           <SheetFooter>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import { ArrowLeftIcon, SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { CodeEditor } from "@/components/ui/code-editor";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
@@ -281,15 +282,16 @@ export function TemplateEditorPage({ id }: { id: string }) {
           <Separator />
 
           <Field data-invalid={!!errors.mjml} className="flex flex-col">
-            <FieldLabel htmlFor="mjml">
-              {t("templateEditor.fields.mjml")}
-            </FieldLabel>
-            <Textarea
-              id="mjml"
-              rows={16}
-              className="font-mono text-xs"
-              aria-invalid={!!errors.mjml}
-              {...register("mjml")}
+            <FieldLabel>{t("templateEditor.fields.mjml")}</FieldLabel>
+            <Controller
+              name="mjml"
+              control={control}
+              render={({ field }) => (
+                <CodeEditor
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                />
+              )}
             />
             {errors.mjml && <FieldError>{errors.mjml.message}</FieldError>}
           </Field>
